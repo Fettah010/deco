@@ -1,0 +1,9 @@
+# Winget version manifest for deco (v0.1.0).
+# Publish flow: dotnet publish (single-file win-x64) -> zip -> GitHub Release
+# tag v0.1.0 -> update InstallerUrl + InstallerSha256 below -> `winget validate`
+# -> PR to winget-pkgs. See packaging/README.md.
+PackageIdentifier: DevEcosystem.Deco
+PackageVersion: 0.1.0
+DefaultLocale: en-US
+ManifestType: version
+ManifestVersion: 1.10.0

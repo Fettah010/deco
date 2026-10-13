@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DevCli.Commands/DevCli.Commands.csproj" />
+    <Project Path="src/DevCli.Core/DevCli.Core.csproj" />
+    <Project Path="src/DevCli.Infrastructure/DevCli.Infrastructure.csproj" />
+    <Project Path="src/DevCli/DevCli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DevCli.Commands.Tests/DevCli.Commands.Tests.csproj" />
+    <Project Path="tests/DevCli.Core.Tests/DevCli.Core.Tests.csproj" />
+    <Project Path="tests/DevCli.Infrastructure.Tests/DevCli.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>

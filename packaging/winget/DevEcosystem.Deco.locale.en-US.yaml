@@ -1,0 +1,21 @@
+# Winget locale manifest for deco (v0.1.0).
+PackageIdentifier: DevEcosystem.Deco
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: DevEcosystem
+PackageName: DevEcosystem Commander (deco)
+License: MIT
+ShortDescription: One CLI for build, release, Microsoft Store and Hyper-V screenshot-lab workflows.
+Description: deco replaces ~199 scattered PowerShell scripts with a single upgradable
+  .NET tool: version quad-sync, listing/screenshot scaffolding, icon/shortcut/splash
+  generation, MSIX + Velopack packaging, WACK gating, Store submission automation,
+  and a Hyper-V capture-VM lab. Host-safe by design: only deco's own browser
+  profile and RDP viewer are ever closed or hidden.
+Tags:
+- cli
+- dotnet
+- msix
+- windows-store
+- hyper-v
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

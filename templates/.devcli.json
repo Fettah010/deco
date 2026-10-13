@@ -1,0 +1,11 @@
+{
+  "$schema": "https://decoschema.local/devcli.json",
+  "//": "Created by `deco init`. Only appId is required; everything else is optional.",
+  "appId": "MyApp",
+  "locales": ["en-US"],
+  "storeAppId": "",
+  "capture": {
+    "vmName": "",
+    "vmUser": ""
+  }
+}

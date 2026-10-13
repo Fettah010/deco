@@ -1,0 +1,11 @@
+{
+  // DevCli describes itself: dogfood manifest for `deco info`.
+  "appId": "DevCli",
+  "csproj": "src/DevCli/DevCli.csproj",
+  "protocol": "deco://",
+  "channels": ["stable", "beta", "dev"],
+  "features": {
+    "updates": "velopack",
+    "distribution": "dotnet-tool"
+  }
+}

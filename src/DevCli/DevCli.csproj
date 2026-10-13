@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>DevCli</RootNamespace>
+    <AssemblyName>deco</AssemblyName>
+    <ToolCommandName>deco</ToolCommandName>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+    <InformationalVersion>0.2.0</InformationalVersion>
+    <Description>DevEcosystem Commander (deco) — one CLI for build, release, Store and VM workflows.</Description>
+    <PackageId>DevEcosystem.Deco</PackageId>
+    <Authors>DevEcosystem</Authors>
+    <PackageDescription>DevEcosystem Commander (deco) — one CLI for build, release, Store and VM lab workflows.</PackageDescription>
+    <PackageTags>cli;windows;msix;store;hyper-v</PackageTags>
+    <PackAsTool>true</PackAsTool>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DevCli.Core\DevCli.Core.csproj" />
+    <ProjectReference Include="..\DevCli.Commands\DevCli.Commands.csproj" />
+    <ProjectReference Include="..\DevCli.Infrastructure\DevCli.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
+    <PackageReference Include="Spectre.Console" Version="0.57.2" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>

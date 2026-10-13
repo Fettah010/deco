@@ -1,0 +1,19 @@
+# Winget installer manifest for deco (v0.1.0). Fill InstallerUrl/Sha256 on release.
+PackageIdentifier: DevEcosystem.Deco
+PackageVersion: 0.1.0
+Platform:
+- Windows.Desktop
+MinimumOSVersion: 10.0.17763.0
+InstallModes:
+- silent
+Installers:
+- Architecture: x64
+  InstallerType: zip
+  InstallerUrl: https://github.com/DevEcosystem/DevCli/releases/download/v0.1.0/deco-0.1.0-win-x64.zip
+  InstallerSha256: REPLACE_ON_RELEASE
+  NestedInstallerType: portable
+  NestedInstallerFiles:
+  - RelativeFilePath: deco.exe
+    PortableCommandAlias: deco
+ManifestType: installer
+ManifestVersion: 1.10.0
