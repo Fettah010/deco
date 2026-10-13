@@ -8,6 +8,54 @@ All notable changes to `deco` (DevEcosystem Commander).
 > (all command domains shipped). Until then, Phase milestones ship as
 > v0.0.x: v0.0.1 = Phase 0 … v0.0.8 = Phase 3d, v0.0.9 = Phase 4. v0.1.0 = full plan.
 
+## [0.3.0] - 2026-10-13 — sandbox capture MVP
+
+### Added
+
+- `deco sandbox provision`: fetches the versioned FlaUI-net48 guest stack
+  (FlaUI.Core/UIA3 5.0.0 + Interop.UIAutomationClient) from nuget.org into
+  `%LocalAppData%/deco/sandbox-guest` (offline after the first run).
+- `deco sandbox capture`: disposable-Sandbox screenshot runs (.wsb with
+  vGPU/memory/network/mapped folders, done/failed sentinel protocol,
+  teardown). `--exe`/`--msix`, `--plan` (ScreenshotPlan v2 drive steps),
+  `--preflight-only`, `--self-test` (host-run notepad round-trip),
+  `--dry-run`. Output lands in the VM-compatible
+  `Releases/Store/<ver>/screenshots` layout.
+- ScreenshotPlan v2: optional `launch{}` + per-shot `steps[]`
+  (click/type/keys/wait), strictly validated; v1 files load unchanged.
+- Guest runner `guest/capture.ps1` (embedded in the binary, pinned by
+  test): FlaUI over Add-Type with zero guest installs, app-agnostic window
+  discovery, manifest.json + sentinels.
+
+### Proven (this machine)
+
+- Host-run guest self-test green; Formixa main window captured (dark Home
+  + What's New dialog); a v2 plan with a `click name:OK` step dismisses the
+  dialog and captures both states (verified pixel-identical flow).
+- **Sandbox end-to-end green**: Formixa 0.9.0 captured inside the Sandbox
+  (light Home + Welcome dialog, 2032x1111) via `sandbox capture --exe`,
+  manifest + owned teardown verified.
+- vGPU defaults OFF (WARP): a wedged paravirtualized-GPU stack kills boots
+  pre-logon with zero diagnostics; `--vgpu` opts back in. Software
+  rendering is pixel-identical for static captures.
+
+### Fixed
+
+- Sandbox runs no longer die with the CLI window: `capture --detach`
+  (pinned `--run-id`) survives aborts and closed terminals; only closing
+  the Sandbox window itself kills a run.
+- New `sandbox status` (sentinels + progress tail + shot count, session
+  PIDs, live sessions with CPU, VM death events) and `sandbox kill`.
+- Pre-launch slot guard: fail fast when another sandbox is active instead
+  of polling a dead stage. Guard + teardown target the real session
+  processes (`WindowsSandboxRemoteSession/Server`, never the stub).
+- Teardown is ownership-bound (session PIDs recorded at boot, re-verified
+  at kill, PID-reuse safe). Image-wide killing stays behind explicit `kill`.
+- Guest progress heartbeat + scan diagnostics; hardened guest head (no
+  silent-death path remains); stage hygiene (cleaned on success).
+- Capture minimizes the Sandbox window by default (`--foreground` opts
+  out); waiting runs hold off host sleep and restore it after.
+
 ## [0.2.0] - 2026-10-12 — outsider-ready foundations
 
 ### Added

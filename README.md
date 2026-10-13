@@ -52,7 +52,7 @@ portal-login check.
 |---|---|
 | Project | `init` (onboard a repo), `info` (resolved context), `doctor` (readiness), `version` |
 | Build & test | `build msix`, `build velopack`, `scaffold`, `smoke`, `test`, `wack` |
-| Screenshots | `vm` (Hyper-V lab: `credential`, `protect`, `provision`, `capture`…), `store shots` (approve/test) |
+| Screenshots | `vm` (Hyper-V lab: `credential`, `protect`, `provision`, `capture`…), `sandbox` (Sandbox lab: `provision`, `capture --detach`, `status`, `kill`), `store shots` (approve/test) |
 | Store | `store listings`, `store pricing`, `store portal` (browser driver), `store portal-price`, `store cert-watch`, `store evidence`, `store submit`, `msstore` |
 | Release | `release store` (staged pipeline), `github` |
 
@@ -93,7 +93,7 @@ automation can always override. Credentials come from flags or `DECO_STORE_*`
 
 ## Status
 
-Current version: **v0.2.0** — outsider-ready foundations (`init`, `doctor`,
+Current version: **v0.3.0** — sandbox capture MVP (`provision`, `capture`, ScreenshotPlan v2).
 manifest schema v2, config-driven locales/VM/paths). Battle-tested shipping
 real Store releases (Formixa 0.8.0, 0.9.0).
 

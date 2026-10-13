@@ -23,14 +23,27 @@ public static class StoreShots
         long MaximumFileSizeBytes,
         int MinimumShotsPerLocale,
         int MaximumShotsPerLocale,
-        List<Shot> Shots);
+        List<Shot> Shots,
+        ShotLaunch? Launch);
 
     public sealed record Shot(
         string Id,
         int Order,
         string FileName,
         Dictionary<string, string> Caption,
-        Dictionary<string, string> ExpectedMarkerText);
+        Dictionary<string, string> ExpectedMarkerText,
+        List<ShotStep> Steps);
+
+    /// <summary>Schema v2: how the guest runner starts the app (v1 plans: null).</summary>
+    public sealed record ShotLaunch(string? Exe, string Args, Dictionary<string, string> Env);
+
+    /// <summary>
+    /// Schema v2: one guest-runner instruction. Actions: click (Target =
+    /// AutomationId, or "name:..." for Name lookup), type (Target + Text),
+    /// keys (Text, e.g. "{Tab}{Enter}"), wait (optional Target to appear,
+    /// TimeoutSec doubles as plain sleep). v1 shots carry none.
+    /// </summary>
+    public sealed record ShotStep(string Action, string Target, string Text, int TimeoutSec);
 
     public sealed record Provenance(
         string GitCommit,
@@ -49,7 +62,7 @@ public static class StoreShots
         int schemaVersion = plan.TryGetProperty("schemaVersion", out JsonElement sv) && sv.TryGetInt32(out int s) ? s : 0;
         string family = plan.TryGetProperty("deviceFamily", out JsonElement df) && df.ValueKind == JsonValueKind.String
             ? df.GetString() ?? string.Empty : string.Empty;
-        if (schemaVersion != 1 || family != "Desktop")
+        if ((schemaVersion != 1 && schemaVersion != 2) || family != "Desktop")
         {
             throw new Core.DecoException("Screenshot plan has an unsupported schema version or device family.", "shots-plan");
         }
@@ -72,7 +85,8 @@ public static class StoreShots
                 s.GetProperty("order").GetInt32(),
                 s.GetProperty("fileName").GetString() ?? string.Empty,
                 s.GetProperty("caption").EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString() ?? string.Empty, StringComparer.Ordinal),
-                s.GetProperty("expectedMarkerText").EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString() ?? string.Empty, StringComparer.Ordinal)))
+                s.GetProperty("expectedMarkerText").EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString() ?? string.Empty, StringComparer.Ordinal),
+                ParseSteps(s, s.GetProperty("id").GetString() ?? string.Empty)))
             .OrderBy(s => s.Order)
             .ToList();
 
@@ -121,7 +135,75 @@ public static class StoreShots
             plan.GetProperty("minimumWidth").GetInt32(),
             plan.GetProperty("minimumHeight").GetInt32(),
             plan.GetProperty("maximumFileSizeBytes").GetInt64(),
-            minShots, maxShots, shots);
+            minShots, maxShots, shots, ParseLaunch(plan));
+    }
+
+    private static ShotLaunch? ParseLaunch(JsonElement plan)
+    {
+        if (!plan.TryGetProperty("launch", out JsonElement l) || l.ValueKind != JsonValueKind.Object)
+        {
+            return null;
+        }
+
+        var env = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (l.TryGetProperty("env", out JsonElement e) && e.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var p in e.EnumerateObject())
+            {
+                if (p.Value.ValueKind == JsonValueKind.String)
+                {
+                    env[p.Name] = p.Value.GetString() ?? string.Empty;
+                }
+            }
+        }
+
+        return new ShotLaunch(
+            l.TryGetProperty("exe", out JsonElement x) && x.ValueKind == JsonValueKind.String ? x.GetString() : null,
+            l.TryGetProperty("args", out JsonElement a) && a.ValueKind == JsonValueKind.String ? a.GetString() ?? string.Empty : string.Empty,
+            env);
+    }
+
+    private static List<ShotStep> ParseSteps(JsonElement shot, string shotId)
+    {
+        var steps = new List<ShotStep>();
+        if (!shot.TryGetProperty("steps", out JsonElement arr) || arr.ValueKind != JsonValueKind.Array)
+        {
+            return steps;
+        }
+
+        foreach (var s in arr.EnumerateArray())
+        {
+            string action = (s.TryGetProperty("action", out JsonElement a) && a.ValueKind == JsonValueKind.String
+                ? a.GetString() ?? string.Empty : string.Empty).Trim().ToLowerInvariant();
+            string target = s.TryGetProperty("target", out JsonElement t) && t.ValueKind == JsonValueKind.String
+                ? t.GetString() ?? string.Empty : string.Empty;
+            string text = s.TryGetProperty("text", out JsonElement x) && x.ValueKind == JsonValueKind.String
+                ? x.GetString() ?? string.Empty : string.Empty;
+            int timeout = s.TryGetProperty("timeoutSec", out JsonElement to) && to.ValueKind == JsonValueKind.Number
+                ? to.GetInt32() : 30;
+            timeout = Math.Clamp(timeout, 1, 300);
+
+            switch (action)
+            {
+                case "click" when string.IsNullOrWhiteSpace(target):
+                case "type" when string.IsNullOrWhiteSpace(target) || string.IsNullOrWhiteSpace(text):
+                case "keys" when string.IsNullOrWhiteSpace(text):
+                    throw new Core.DecoException(
+                        $"Screenshot '{shotId}' has a '{action}' step with missing target/text.", "shots-plan-step");
+                case "click":
+                case "type":
+                case "keys":
+                case "wait":
+                    steps.Add(new ShotStep(action, target.Trim(), text, timeout));
+                    break;
+                default:
+                    throw new Core.DecoException(
+                        $"Screenshot '{shotId}' has an unknown step action '{action}' (want click|type|keys|wait).",
+                        "shots-plan-step");
+            }
+        }
+
+        return steps;
     }
 
     /// <summary>PNG width/height from the IHDR chunk (no decoder). Throws when not a PNG.</summary>

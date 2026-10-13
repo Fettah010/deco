@@ -4,8 +4,8 @@
 > Cleaner · Easier · Upgradable · Scalable · Works with every app/project.
 > Version rule: **v0.1.0 = the full plan implemented** (all command domains shipped).
 > Until then, phase milestones ship as v0.0.x.
-> Status: **v0.2.0 SHIPPED** (outsider-ready foundations: init, doctor, manifest schema v2).
-> Phase history: v0.0.1 = Phase 0 · v0.0.2 = Phase 1 · v0.0.3 = Phase 2a · v0.0.4 = Phase 2b · v0.0.5 = Phase 3a · v0.0.6 = Phase 3b · v0.0.7 = Phase 3c · v0.0.8 = Phase 3d · v0.0.9 = Phase 4 · v0.1.0 = full plan · v0.1.1 = VM lab hardening · v0.1.2 = cert-watch · v0.1.3 = cert-watch instant + memory · v0.1.4 = cert-watch list/select/all · v0.1.5 = visual voice + help polish · v0.1.6 = colorized help + full-palette outputs · v0.1.7 = cleanup (archive/split/dedupe) · v0.1.8 = pricing/description/dup-shot guardrails + agent store rules · v0.1.9 = markup crash fix · v0.1.10 = per-market store pricing command · v0.1.11 = portal base-price driver · v0.2.0 = outsider-ready foundations.
+> Status: **v0.3.0 SHIPPED** (sandbox capture MVP: provision, capture, ScreenshotPlan v2).
+> Phase history: v0.0.1 = Phase 0 · v0.0.2 = Phase 1 · v0.0.3 = Phase 2a · v0.0.4 = Phase 2b · v0.0.5 = Phase 3a · v0.0.6 = Phase 3b · v0.0.7 = Phase 3c · v0.0.8 = Phase 3d · v0.0.9 = Phase 4 · v0.1.0 = full plan · v0.1.1 = VM lab hardening · v0.1.2 = cert-watch · v0.1.3 = cert-watch instant + memory · v0.1.4 = cert-watch list/select/all · v0.1.5 = visual voice + help polish · v0.1.6 = colorized help + full-palette outputs · v0.1.7 = cleanup (archive/split/dedupe) · v0.1.8 = pricing/description/dup-shot guardrails + agent store rules · v0.1.9 = markup crash fix · v0.1.10 = per-market store pricing command · v0.1.11 = portal base-price driver · v0.2.0 = outsider-ready foundations · v0.3.0 = sandbox capture MVP.
 > Imaging note: **SkiaSharp (MIT)** — ImageSharp 4.x needs a commercial build license; 3.x fails NuGet audit.
 
 ---
@@ -131,6 +131,7 @@ Exit codes: `0` ok · `1` error · `2` usage/auth-needed (old `3`/`4` fold into 
 | **v0.1.0 ✅ DONE (full plan)** | Host-safety hardening (no more kill-all Edge/mstsc) + `completions` + Winget/dotnet-tool packaging + cutover kit (`dev.ps1` shim, `.devcli.json`, `CUTOVER.md`) | Live proof: 24 Edge PIDs across test run, 0 killed; full suite green |
 | **v0.1.1–v0.1.11 ✅ DONE** | VM lab hardening · cert-watch (+instant/memory/list) · visual voice + colorized help · archive/split/dedupe · pricing guardrails + agent store rules · markup crash fix · per-market `store pricing` · portal base-price driver `store portal-price` (Formixa 0.9.0 submitted at €2.99, PreProcessing) | Production releases 0.8.0 + 0.9.0; 9/9 + 10/10 fixture self-tests on Cloak; split-brain + trusted-commit learnings in AGENTS.md rule 9 |
 | **v0.2.0 ✅ DONE (outsider-ready foundations)** | Manifest schema v2 (`locales`, `paths{}`, `capture{}`) + resolved `ProjectContext`; flag > manifest > legacy everywhere (locales, VM name/user, `DECO_STORE_*` envs, layout dirs); `deco doctor`; `deco init` + tokenized templates; Formixa dogfood manifest | 313/313 tests (42 Core + 222 Commands + 49 Infra); Formixa dry-runs byte-identical; fresh-clone smoke: init→doctor, zero Formixa strings in generated files |
+| **v0.3.0 ✅ DONE (sandbox capture MVP)** | `sandbox provision` (FlaUI-net48 guest stack) + `sandbox capture` (.wsb, sentinel protocol, teardown; `--exe/--msix/--plan/--preflight-only/--self-test/--dry-run`); ScreenshotPlan v2 (`launch{}` + per-shot `steps[]`); guest runner `guest/capture.ps1` (embedded + pinned) | Host-run guest self-test green; Formixa main window captured (dark Home + dialog); v2 plan `click name:OK` dismisses dialog, both states captured; live Sandbox boot pending (feature absent here — fail-fast gate proven) |
 | **v0.3.0 (planned)** | Sandbox capture MVP: orchestrator + generic guest runner (FlaUI-net48 over Add-Type, zero guest installs) + ScreenshotPlan v2 + sentinel protocol + evidence integration | 8-shot matrix from Sandbox passes approval gates interchangeably with VM shots |
 | **v0.4.0 (planned)** | Diagnose suite: `capture diagnose` (env/tree/screenshot-diff) + read-only `store diagnose` | No defect reaches submit that diagnose could have caught |
 | **v0.5.0 (planned)** | Outsider onboarding: `init` wizard, `onboard` guide, docs overhaul, validation on a second real app | Second app reaches Store flighting on public docs alone |
@@ -257,3 +258,36 @@ MSIX SDK sensitivity (incl. the `.pri` explicit-publish rule) → toolchain prob
 * `dotnet build` → **0 warnings, 0 errors**; `dotnet test` → **313/313 green** (42 Core + 222 Commands + 49 Infrastructure).
 * Live proof: `doctor` on Formixa (manifest pinned, vm pinned, actionable warns); `vm capture --dry-run` and `store portal --dry-run` outputs identical to v0.1.11; fresh-clone smoke (init --locales en-US,de-DE --vm-name LabVM) → manifest+shim with zero Formixa strings, doctor green-or-actionable.
 * `deco --version` → `0.2.0`. Next: **v0.3.0** = Sandbox capture MVP.
+
+### v0.3.0 — sandbox capture MVP
+
+* New: `sandbox provision` (FlaUI.Core/UIA3 5.0.0 + Interop.UIAutomationClient 10.19041.0, net48/net45, manifest + sha256; fake-zip unit tests) + `sandbox capture` (staging, .wsb, detached launch, sentinel poll, copy-back, teardown; preflight/self-test/dry-run).
+* New: ScreenshotPlan v2 (`launch{exe,args,env}` + per-shot `steps[]` click/type/keys/wait, clamped timeouts, strict validation; v1 loads unchanged) + `guest/capture.ps1` (FlaUI over Add-Type, AssemblyResolve-free preload closure, app-agnostic window discovery, manifest + done/failed sentinels, stale-sentinel purge).
+* API research baked in: FlaUI v5 capture lives in `FlaUI.Core.Capturing` (`Capture.Element().ToFile()`); UIA3 needs Interop.UIAutomationClient alongside Core; WinAppDriver stays out (dead).
+* `dotnet build` → **0 warnings, 0 errors**; `dotnet test` → **338/338 green** (42 Core + 242 Commands + 54 Infra).
+* Live proof (this machine, no Sandbox): real `provision` from nuget.org; command `--self-test` green; guest run mode captures Formixa 0.9.7 dark Home (dialog + dismissed states) via a temp v2 plan; `.wsb`/mappings/guest-path translation verified by `--preflight-only`; launch fail-fast proven (feature absent → seconds, actionable error; fixed a cmd/start hang + missing exit-code check along the way).
+* Pending (needs owner action): enable the Sandbox feature (elevated + reboot), then one `sandbox capture --exe` run proves the container end-to-end.
+* `deco --version` → `0.3.0`. Next: **v0.4.0** = diagnose suite.
+
+### v0.3.0 follow-up — Sandbox feature enable + hardening (uncommitted)
+
+* Machine: Win Pro (build 26300), 31 GB RAM, hypervisor running, Sandbox feature absent.
+* Enabled `Containers-DisposableClientVM` elevated (`-All -NoRestart`, RestartNeeded=True). Reboot still required — live container proof queued behind it.
+* Fixed along the way: `cmd/start` spawning hung on spaced paths → PowerShell `Start-Process`; launch exit codes now checked; stage dirs cleaned on success (kept + printed on failure); `doctor` hyperv/sandbox fall back to service/launcher probes without elevation (2 new tests).
+* Post-reboot proof script: `deco sandbox capture --exe <Formixa.exe> --version sandbox-mvp` (expect shots + manifest, then delete the proof dir).
+
+### v0.3.0 proof — Sandbox end-to-end green (foreground)
+
+* `sandbox capture --exe Formixa.exe --version sandbox-mvp` (attached): boot
+  ~1 min, app launch, Win32-cross-checked window match, `Capture.Element`
+  screenshot 2032x1111, copy-back, owned-PID teardown — all green.
+* Root causes found by evidence, not guessing: (1) slot guard + teardown
+  targeted the `WindowsSandbox.exe` stub instead of RemoteSession/Server;
+  (2) stale runs murdered fresh sessions (now PID-bound); (3) UIA PIDs can
+  lie (ValueOrDefault 0) — Win32 MainWindowHandle cross-check; (4) wedged
+  vGPU stack kills boots pre-logon silently — vGPU now defaults off
+  (`--vgpu` opts in); (5) silent-death holes closed (transcript-in-try,
+  whole-preamble-in-try, hardened Fail, unbuffered progress.log).
+* Deferred to v0.3.x: one anomalous empty detached stage (parent killed
+  mid-staging by an abort is the lead theory — atomic staging rename);
+  full-matrix `shots test` interchange; `sandbox diagnose` command.

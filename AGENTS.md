@@ -4,7 +4,7 @@ Guidance for AI agents working in this repo. Read first.
 
 ## What this is
 
-**`deco`** (DevEcosystem Commander), v0.2.0 — the single CLI that will replace
+**`deco`** (DevEcosystem Commander), v0.3.0 — the single CLI that will replace
 ~199 `.ps1` files across Formixa / DevTem WinUI 3 / DevDesk.
 **v0.1.0 = the full plan implemented** (all command domains shipped, packaged).
 Ship patch versions (v0.1.x) for fixes; propose the next milestone in

@@ -172,10 +172,11 @@ public sealed class StoreShotsFlowTests : IDisposable
             shots.Add(new StoreShots.Shot(
                 $"s{i}", i, $"0{i}-shot.png",
                 new Dictionary<string, string> { ["en-US"] = $"Caption {i} en", ["es-ES"] = $"Caption {i} es" },
-                new Dictionary<string, string> { ["en-US"] = $"Marker {i} en", ["es-ES"] = $"Marker {i} es" }));
+                new Dictionary<string, string> { ["en-US"] = $"Marker {i} en", ["es-ES"] = $"Marker {i} es" },
+                []));
         }
 
-        _plan = new StoreShots.ShotPlan(1, "Desktop", ["en-US", "es-ES"], 8, 8, 1_000_000, 1, 10, shots);
+        _plan = new StoreShots.ShotPlan(1, "Desktop", ["en-US", "es-ES"], 8, 8, 1_000_000, 1, 10, shots, null);
         foreach (string locale in _plan.Locales)
         {
             foreach (var shot in _plan.Shots)
@@ -293,10 +294,11 @@ public sealed class StoreContractPlanTests : IDisposable
             shots.Add(new StoreShots.Shot(
                 $"s{i}", i, $"0{i}-shot.png",
                 new Dictionary<string, string> { ["en-US"] = $"Caption {i} en", ["es-ES"] = $"Caption {i} es" },
-                new Dictionary<string, string> { ["en-US"] = $"Marker {i} en", ["es-ES"] = $"Marker {i} es" }));
+                new Dictionary<string, string> { ["en-US"] = $"Marker {i} en", ["es-ES"] = $"Marker {i} es" },
+                []));
         }
 
-        var plan = new StoreShots.ShotPlan(1, "Desktop", ["en-US", "es-ES"], 8, 8, 1_000_000, 1, 10, shots);
+        var plan = new StoreShots.ShotPlan(1, "Desktop", ["en-US", "es-ES"], 8, 8, 1_000_000, 1, 10, shots, null);
         foreach (string locale in plan.Locales)
         {
             foreach (var shot in plan.Shots)

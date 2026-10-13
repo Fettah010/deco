@@ -171,13 +171,56 @@ public static class DoctorChecks
                 "Run `deco store portal-auth` once (headed sign-in, session is reused).");
     }
 
-    public static Check HyperV(Infrastructure.IProcessRunner runner) =>
-        WindowsFeature(runner, "hyperv", "Microsoft-Hyper-V-All",
-            "Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All (elevated). Only needed for the vm backend.");
+    public static Check HyperV(Infrastructure.IProcessRunner runner)
+    {
+        const string fix = "Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All (elevated). Only needed for the vm backend.";
+        Check dism = WindowsFeature(runner, "hyperv", "Microsoft-Hyper-V-All", fix);
+        if (dism.Status == Pass || !dism.Detail.Contains("needs elevation", StringComparison.OrdinalIgnoreCase))
+        {
+            return dism;
+        }
 
-    public static Check Sandbox(Infrastructure.IProcessRunner runner) =>
-        WindowsFeature(runner, "sandbox", "Containers-DisposableClientVM",
-            "Enable the Windows Sandbox feature (Pro/Enterprise/Education) if you want the sandbox backend.");
+        // Non-elevated fallback: a running hypervisor proves the platform.
+        try
+        {
+            Infrastructure.ProcessResult r = runner.RunAsync("sc.exe", ["query", "vmcompute"],
+                timeout: TimeSpan.FromSeconds(30)).GetAwaiter().GetResult();
+            if ((r.StdOut + "\n" + r.StdErr).Contains("RUNNING", StringComparison.OrdinalIgnoreCase))
+            {
+                return new Check("hyperv", Pass, "hypervisor active (feature state unverified without elevation).", string.Empty);
+            }
+        }
+        catch
+        {
+        }
+
+        return dism;
+    }
+
+    public static Check Sandbox(Infrastructure.IProcessRunner runner, Func<string, bool>? fileExists = null)
+    {
+        const string fix = "Enable the Windows Sandbox feature (Pro/Enterprise/Education) if you want the sandbox backend.";
+        Check dism = WindowsFeature(runner, "sandbox", "Containers-DisposableClientVM", fix);
+        if (dism.Status == Pass || !dism.Detail.Contains("needs elevation", StringComparison.OrdinalIgnoreCase))
+        {
+            return dism;
+        }
+
+        // Non-elevated fallback: the installed launcher proves the feature.
+        fileExists ??= File.Exists;
+        try
+        {
+            if (fileExists(Infrastructure.SandboxRunner.SandboxExe))
+            {
+                return new Check("sandbox", Pass, "installed (first boot activates; state unverified without elevation).", string.Empty);
+            }
+        }
+        catch
+        {
+        }
+
+        return dism;
+    }
 
     public static Check WindowsFeature(Infrastructure.IProcessRunner runner, string id, string feature, string fix)
     {

@@ -8,10 +8,10 @@
     <RootNamespace>DevCli</RootNamespace>
     <AssemblyName>deco</AssemblyName>
     <ToolCommandName>deco</ToolCommandName>
-    <Version>0.2.0</Version>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <FileVersion>0.2.0.0</FileVersion>
-    <InformationalVersion>0.2.0</InformationalVersion>
+    <Version>0.3.0</Version>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
+    <FileVersion>0.3.0.0</FileVersion>
+    <InformationalVersion>0.3.0</InformationalVersion>
     <Description>DevEcosystem Commander (deco) — one CLI for build, release, Store and VM workflows.</Description>
     <PackageId>DevEcosystem.Deco</PackageId>
     <Authors>DevEcosystem</Authors>

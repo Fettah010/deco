@@ -1211,6 +1211,98 @@ static partial class Program
             pr.GetValue(capCaptureMin),
             pr.GetValue(vmDryRun)));
 
+        var sandbox = new Command("sandbox", "Windows Sandbox capture lab (lightweight, disposable; needs the Sandbox feature). E.g. deco sandbox capture --dry-run");
+        root.Subcommands.Add(sandbox);
+        var sbProvision = new Command("provision", "Fetch the Sandbox guest deps (FlaUI stack, versioned). E.g. deco sandbox provision --dry-run");
+        var pvVersion = new Option<string>("--flaui-version") { Description = "FlaUI version to fetch (default: 5.0.0)." };
+        var pvDepsDir = new Option<string>("--deps-dir") { Description = "Guest deps dir (default: %LocalAppData%/deco/sandbox-guest)." };
+        var pvForce = new Option<bool>("--force") { Description = "Re-download even if provisioned." };
+        var pvDryRun = new Option<bool>("--dry-run") { Description = "Print the plan, download nothing." };
+        sbProvision.Options.Add(pvVersion);
+        sbProvision.Options.Add(pvDepsDir);
+        sbProvision.Options.Add(pvForce);
+        sbProvision.Options.Add(pvDryRun);
+        sandbox.Subcommands.Add(sbProvision);
+        sbProvision.SetAction((ParseResult pr) => RunSandboxProvision(
+            pr.GetValue(projectOption),
+            pr.GetValue(verbosityOption) ?? "normal",
+            pr.GetValue(formatOption) ?? "table",
+            pr.GetValue(noAnsiOption),
+            pr.GetValue(pvVersion) ?? string.Empty,
+            pr.GetValue(pvDepsDir) ?? string.Empty,
+            pr.GetValue(pvForce),
+            pr.GetValue(pvDryRun)));
+
+        var sbCapture = new Command("capture", "Capture screenshots in a disposable Sandbox. E.g. deco sandbox capture --exe <app> --dry-run");
+        var scExe = new Option<string>("--exe") { Description = "Unpackaged app exe to launch in the Sandbox." };
+        var scMsix = new Option<string>("--msix") { Description = "MSIX package to install + launch in the Sandbox." };
+        var scPlan = new Option<string>("--plan") { Description = "ScreenshotPlan v2 with drive steps (default: single main-window shot)." };
+        var scVersion = new Option<string>("--version") { Description = "Output version dir (default: csproj InformationalVersion)." };
+        var scMemory = new Option<int>("--memory-mb") { Description = "Sandbox RAM MB (default: 4096)." };
+        var scNoNetwork = new Option<bool>("--no-network") { Description = "Disable Sandbox networking." };
+        var scTimeout = new Option<int>("--timeout-min") { Description = "Capture timeout minutes (default: 15)." };
+        var scPreflight = new Option<bool>("--preflight-only") { Description = "Stage + validate only, never launch." };
+        var scSelfTest = new Option<bool>("--self-test") { Description = "Host-run guest self-test (notepad round-trip, no Sandbox)." };
+        var scDepsDir = new Option<string>("--deps-dir") { Description = "Guest deps dir (default: %LocalAppData%/deco/sandbox-guest)." };
+        var scDryRun = new Option<bool>("--dry-run") { Description = "Print the plan, change nothing." };
+        var scDetach = new Option<bool>("--detach") { Description = "Launch detached (survives closed windows; poll with sandbox status)." };
+        var scRunId = new Option<string>("--run-id") { Description = "Pin the run id (default: timestamp; used by status)." };
+        var scForeground = new Option<bool>("--foreground") { Description = "Keep the Sandbox window up (default: minimized so you can work)." };
+        var scVgpu = new Option<bool>("--vgpu") { Description = "Use paravirtualized GPU (default: WARP software rendering — slower but reliable)." };
+        sbCapture.Options.Add(scExe);
+        sbCapture.Options.Add(scMsix);
+        sbCapture.Options.Add(scPlan);
+        sbCapture.Options.Add(scVersion);
+        sbCapture.Options.Add(scMemory);
+        sbCapture.Options.Add(scNoNetwork);
+        sbCapture.Options.Add(scTimeout);
+        sbCapture.Options.Add(scPreflight);
+        sbCapture.Options.Add(scSelfTest);
+        sbCapture.Options.Add(scDepsDir);
+        sbCapture.Options.Add(scDryRun);
+        sbCapture.Options.Add(scDetach);
+        sbCapture.Options.Add(scRunId);
+        sbCapture.Options.Add(scForeground);
+        sbCapture.Options.Add(scVgpu);
+        sandbox.Subcommands.Add(sbCapture);
+        sbCapture.SetAction((ParseResult pr) => RunSandboxCapture(
+            pr.GetValue(projectOption),
+            pr.GetValue(verbosityOption) ?? "normal",
+            pr.GetValue(formatOption) ?? "table",
+            pr.GetValue(noAnsiOption),
+            pr.GetValue(scExe) ?? string.Empty,
+            pr.GetValue(scMsix) ?? string.Empty,
+            pr.GetValue(scPlan) ?? string.Empty,
+            pr.GetValue(scVersion) ?? string.Empty,
+            pr.GetValue(scMemory),
+            pr.GetValue(scNoNetwork),
+            pr.GetValue(scTimeout),
+            pr.GetValue(scPreflight),
+            pr.GetValue(scSelfTest),
+            pr.GetValue(scDryRun),
+            pr.GetValue(scDepsDir) ?? string.Empty,
+            pr.GetValue(scDetach),
+            pr.GetValue(scRunId) ?? string.Empty,
+            pr.GetValue(scForeground),
+            pr.GetValue(scVgpu)));
+
+        var sbKill = new Command("kill", "Close any running Sandbox (frees the single-session slot). E.g. deco sandbox kill");
+        sandbox.Subcommands.Add(sbKill);
+        sbKill.SetAction((ParseResult pr) => RunSandboxKill(
+            pr.GetValue(verbosityOption) ?? "normal",
+            pr.GetValue(formatOption) ?? "table",
+            pr.GetValue(noAnsiOption)));
+
+        var sbStatus = new Command("status", "Report a capture run (sentinels + progress tail + shots). E.g. deco sandbox status --run 123");
+        var ssRun = new Option<string>("--run") { Description = "Run id (default: newest run)." };
+        sbStatus.Options.Add(ssRun);
+        sandbox.Subcommands.Add(sbStatus);
+        sbStatus.SetAction((ParseResult pr) => RunSandboxStatus(
+            pr.GetValue(verbosityOption) ?? "normal",
+            pr.GetValue(formatOption) ?? "table",
+            pr.GetValue(noAnsiOption),
+            pr.GetValue(ssRun) ?? string.Empty));
+
         var completions = new Command("completions", "Print a shell-completion script (powershell|bash|zsh). E.g. deco completions --shell powershell");
         var cmShell = new Option<string>("--shell") { Description = "Target shell (powershell|bash|zsh)." };
         completions.Options.Add(cmShell);

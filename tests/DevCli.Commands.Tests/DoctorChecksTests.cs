@@ -153,6 +153,30 @@ public sealed class DoctorChecksTests : IDisposable
     }
 
     [Fact]
+    public void HyperV_FallsBackToRunningHypervisor()
+    {
+        var runner = new FakeProc((exe, args) => exe == "sc.exe"
+            ? Ok("SERVICE_NAME: vmcompute\n        STATE              : 4  RUNNING")
+            : Fail("requires elevation"));
+        var check = DoctorChecks.HyperV(runner);
+        Assert.Equal("pass", check.Status);
+        Assert.Contains("hypervisor active", check.Detail);
+    }
+
+    [Fact]
+    public void Sandbox_FallsBackToInstalledLauncher()
+    {
+        var runner = new FakeProc((exe, args) => Fail("requires elevation"));
+        var found = DoctorChecks.Sandbox(runner, path => true);
+        Assert.Equal("pass", found.Status);
+        Assert.Contains("installed", found.Detail);
+
+        var missing = DoctorChecks.Sandbox(runner, path => false);
+        Assert.Equal("warn", missing.Status);
+        Assert.Contains("needs elevation", missing.Detail);
+    }
+
+    [Fact]
     public void VmExists_SkipPassWarn()
     {
         var runner = new FakeProc((exe, args) => Ok("Lab"));
